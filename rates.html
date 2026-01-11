@@ -1,0 +1,634 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>PRAC — Exchange Rates</title>
+    <style>
+        :root {
+            --bg: #050506;
+            --card: #0b0b0c;
+            --muted: #9aa0a6;
+            --accent1: #7c3aed;
+            --accent2: #00d4ff;
+            --danger: #ff6b6b;
+            --success: #5af78e;
+            --warning: #ffd166;
+            --glass: rgba(255, 255, 255, 0.03);
+            --maxw: 1400px;
+            --radius-xl: 28px;
+            --radius-md: 12px;
+            --ease: cubic-bezier(.18, .9, .32, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100%;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: radial-gradient(1200px 600px at 10% 10%, rgba(123, 60, 255, 0.08), transparent),
+                radial-gradient(900px 500px at 90% 80%, rgba(34, 211, 238, 0.06), transparent),
+                var(--bg);
+            color: #fff;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: var(--maxw);
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navigation */
+        header.nav {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            backdrop-filter: blur(12px) saturate(180%);
+            background: linear-gradient(180deg, rgba(11, 11, 12, 0.85), rgba(11, 11, 12, 0.7));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo-mark {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent1), var(--danger));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        nav.main-nav {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        nav.main-nav a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 15px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s var(--ease);
+        }
+
+        nav.main-nav a:hover {
+            color: #fff;
+        }
+
+        nav.main-nav a.active {
+            color: var(--danger);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s var(--ease);
+            display: inline-block;
+        }
+
+        .btn.ghost {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--muted);
+        }
+
+        /* Rates Header */
+        .rates-header {
+            padding: 60px 0 40px;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(124, 58, 237, 0.05));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 52px;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 18px;
+            margin-bottom: 48px;
+            max-width: 70ch;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Main Rates Grid */
+        .main-rates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .rate-card {
+            background: linear-gradient(165deg, rgba(20, 20, 22, 0.95), rgba(8, 8, 9, 0.98));
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            transition: all 0.3s var(--ease);
+        }
+
+        .rate-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(124, 58, 237, 0.3);
+            box-shadow: 0 20px 40px rgba(124, 58, 237, 0.2);
+        }
+
+        .rate-value {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--accent1), var(--danger));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 16px 0;
+        }
+
+        /* All Rates Section */
+        .all-rates-section {
+            margin-top: 60px;
+            padding: 40px;
+            background: linear-gradient(165deg, rgba(20, 20, 22, 0.95), rgba(8, 8, 9, 0.98));
+            border-radius: var(--radius-xl);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, var(--accent1), var(--danger));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .section-subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        /* Search Box */
+        .search-box {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            color: white;
+            font-size: 16px;
+            margin-bottom: 24px;
+            transition: all 0.3s var(--ease);
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--accent1);
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        /* Rates Table */
+        .rates-table-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .rates-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .rates-table th,
+        .rates-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .rates-table th {
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+            color: var(--accent1);
+            position: sticky;
+            top: 0;
+        }
+
+        .rates-table tr:hover {
+            background: rgba(124, 58, 237, 0.05);
+        }
+
+        .currency-code {
+            font-weight: 600;
+            color: white;
+        }
+
+        .currency-name {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .rate-change {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .rate-change.positive {
+            background: rgba(90, 247, 142, 0.1);
+            color: var(--success);
+        }
+
+        .rate-change.negative {
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--danger);
+        }
+
+        /* Features Section */
+        .features-section {
+            margin-top: 60px;
+            padding: 40px;
+            background: linear-gradient(165deg, rgba(20, 20, 22, 0.95), rgba(8, 8, 9, 0.98));
+            border-radius: var(--radius-xl);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .feature-item {
+            padding: 20px;
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s var(--ease);
+        }
+
+        .feature-item:hover {
+            background: rgba(124, 58, 237, 0.1);
+            border-color: rgba(124, 58, 237, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 48px 0;
+            color: var(--muted);
+            font-size: 14px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            margin-top: 60px;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+        }
+
+        .loader {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(124, 58, 237, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent1);
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 980px) {
+            .main-rates-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .all-rates-section,
+            .features-section {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 40px;
+            }
+        }
+
+        @media (max-width: 540px) {
+            .main-rates-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 32px;
+            }
+
+            .logo-text {
+                display: none;
+            }
+
+            .rate-value {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <header class="nav">
+        <div class="container nav-inner">
+            <a class="logo" href="dashboard.html">
+                <div class="logo-mark">P</div>
+                <div class="logo-text">PRAC</div>
+            </a>
+
+            <nav class="main-nav">
+                <a href="rates.html" class="active">Rates</a>
+                <a href="dashboard.html">Dashboard</a>
+                <span style="color: var(--muted); font-size: 14px;" id="userWelcome">User</span>
+                <a class="btn ghost" href="#" id="logoutBtn">Log out</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Rates Header -->
+    <div class="rates-header">
+        <div class="container">
+            <h1>Live Exchange Rates</h1>
+            <p class="subtitle">Real-time currency rates with no hidden fees. What you see is what you get.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Main Rates Grid -->
+        <div class="main-rates-grid">
+            <div class="rate-card">
+                <div style="color: var(--muted); font-size: 14px;">USD → EUR</div>
+                <div class="rate-value">...</div>
+                <div style="color: var(--success); font-size: 12px;">+0.12% today</div>
+            </div>
+            <div class="rate-card">
+                <div style="color: var(--muted); font-size: 14px;">USD → GBP</div>
+                <div class="rate-value">...</div>
+                <div style="color: var(--success); font-size: 12px;">+0.08% today</div>
+            </div>
+            <div class="rate-card">
+                <div style="color: var(--muted); font-size: 14px;">USD → MAD</div>
+                <div class="rate-value">...</div>
+                <div style="color: var(--danger); font-size: 12px;">-0.05% today</div>
+            </div>
+            <div class="rate-card">
+                <div style="color: var(--muted); font-size: 14px;">EUR → USD</div>
+                <div class="rate-value">...</div>
+                <div style="color: var(--success); font-size: 12px;">+0.15% today</div>
+            </div>
+        </div>
+
+        <!-- All Rates Section -->
+        <div class="all-rates-section">
+            <div class="section-title">All Exchange Rates</div>
+            <p class="section-subtitle">Live rates for 170+ currencies worldwide • Updated every minute</p>
+
+            <input type="text" class="search-box" id="currencySearch"
+                placeholder="🔍 Search currencies (e.g., EUR, Japanese Yen, €)...">
+
+            <div class="rates-table-container">
+                <table class="rates-table">
+                    <thead>
+                        <tr>
+                            <th>Currency</th>
+                            <th>Code</th>
+                            <th>Rate (per USD)</th>
+                            <th>Change</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ratesBody">
+                        <!-- Rates will be loaded here -->
+                        <tr>
+                            <td colspan="4" class="loading">
+                                <div class="loader"></div><br>Loading rates...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="features-section">
+            <div class="section-title">Why Our Rates Are Better</div>
+            <p class="section-subtitle">Transparent pricing with no hidden fees</p>
+
+            <div class="features-grid">
+                <div class="feature-item">
+                    <span class="feature-icon">💰</span>
+                    <div style="font-weight: 600; margin-bottom: 8px; color: var(--accent1);">Real Market Rates</div>
+                    <p style="color: var(--muted); font-size: 14px;">We use live interbank rates with minimal markup,
+                        saving you money on every transaction.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">💎</span>
+                    <div style="font-weight: 600; margin-bottom: 8px; color: var(--accent1);">No Hidden Fees</div>
+                    <p style="color: var(--muted); font-size: 14px;">See the exact amount you'll receive before you
+                        send. No surprises, no hidden charges.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">⚡</span>
+                    <div style="font-weight: 600; margin-bottom: 8px; color: var(--accent1);">Instant Updates</div>
+                    <p style="color: var(--muted); font-size: 14px;">Rates update in real-time, ensuring you always get
+                        the best possible exchange rate.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div style="margin-bottom: 16px; font-size: 16px; font-weight: 600;">PRAC — Pay • Receive • Convert</div>
+            <div>© 2024 PRAC · <a href="#" style="color: var(--muted); text-decoration: none;">Security</a> · <a
+                    href="#" style="color: var(--muted); text-decoration: none;">Support</a> · <a href="rates.html"
+                    style="color: var(--muted); text-decoration: none;">Rates</a></div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        window.addEventListener('load', function () {
+            const user = localStorage.getItem('prac_user');
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const userData = JSON.parse(user);
+
+            // Update welcome message
+            const welcomeEl = document.getElementById('userWelcome');
+            welcomeEl.textContent = `Welcome, ${userData.username || 'User'}!`;
+            welcomeEl.style.background = 'linear-gradient(90deg, var(--accent1), var(--danger))';
+            welcomeEl.style.webkitBackgroundClip = 'text';
+            welcomeEl.style.backgroundClip = 'text';
+            welcomeEl.style.color = 'transparent';
+
+            // Load rates
+            loadRates();
+        });
+
+        async function loadRates() {
+            try {
+                const response = await fetch('transaction-api.php?action=rates');
+                const data = await response.json();
+
+                if (data.success) {
+                    const rates = data.rates;
+
+                    // Update Main Rates Grid
+                    // USD -> EUR
+                    updateRateCard(0, rates.USD.EUR);
+                    // USD -> GBP
+                    updateRateCard(1, rates.USD.GBP);
+                    // USD -> MAD
+                    updateRateCard(2, rates.USD.MAD);
+                    // EUR -> USD
+                    updateRateCard(3, rates.EUR.USD);
+
+                    // Update Table
+                    const tbody = document.getElementById('ratesBody');
+                    tbody.innerHTML = '';
+
+                    const displayCurrencies = [
+                        { code: 'USD', name: 'US Dollar' },
+                        { code: 'EUR', name: 'Euro' },
+                        { code: 'GBP', name: 'British Pound' },
+                        { code: 'MAD', name: 'Moroccan Dirham' }
+                    ];
+
+                    displayCurrencies.forEach(curr => {
+                        let rate = 1.0;
+                        if (curr.code !== 'USD') {
+                            rate = rates.USD[curr.code];
+                        }
+
+                        // Mock change for now as API doesn't return change
+                        const isPositive = Math.random() > 0.5;
+                        const change = (Math.random() * 0.5).toFixed(2);
+
+                        const row = `
+                            <tr>
+                                <td>
+                                    <div class="currency-code">${curr.code}</div>
+                                    <div class="currency-name">${curr.name}</div>
+                                </td>
+                                <td>${curr.code}</td>
+                                <td>${rate.toFixed(6)}</td>
+                                <td><span class="rate-change ${isPositive ? 'positive' : 'negative'}">${isPositive ? '↗' : '↘'} ${change}%</span></td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading rates:', error);
+                document.getElementById('ratesBody').innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--danger);">Error loading rates</td></tr>';
+            }
+        }
+
+        function updateRateCard(index, rate) {
+            const cards = document.querySelectorAll('.rate-card');
+            if (cards[index]) {
+                cards[index].querySelector('.rate-value').textContent = rate.toFixed(4);
+            }
+        }
+
+        // Search functionality
+        document.getElementById('currencySearch').addEventListener('input', function (e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#ratesBody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function (e) {
+            e.preventDefault();
+            localStorage.removeItem('prac_user');
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+
+</html>

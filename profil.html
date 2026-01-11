@@ -1,0 +1,855 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>PRAC — Profile Settings</title>
+    <style>
+        :root {
+            --bg: #050506;
+            --card: #0b0b0c;
+            --muted: #9aa0a6;
+            --accent1: #7c3aed;
+            --accent2: #00d4ff;
+            --danger: #ff6b6b;
+            --success: #5af78e;
+            --warning: #ffd166;
+            --glass: rgba(255, 255, 255, 0.03);
+            --maxw: 1400px;
+            --radius-xl: 28px;
+            --radius-md: 12px;
+            --ease: cubic-bezier(.18, .9, .32, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100%;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: radial-gradient(1200px 600px at 10% 10%, rgba(123, 60, 255, 0.08), transparent),
+                radial-gradient(900px 500px at 90% 80%, rgba(34, 211, 238, 0.06), transparent),
+                var(--bg);
+            color: #fff;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: var(--maxw);
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navigation */
+        header.nav {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            backdrop-filter: blur(12px) saturate(180%);
+            background: linear-gradient(180deg, rgba(11, 11, 12, 0.85), rgba(11, 11, 12, 0.7));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo-mark {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent1), var(--danger));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        nav.main-nav {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        nav.main-nav a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 15px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s var(--ease);
+        }
+
+        nav.main-nav a:hover {
+            color: #fff;
+        }
+
+        nav.main-nav a.active {
+            color: var(--danger);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s var(--ease);
+            display: inline-block;
+        }
+
+        .btn.ghost {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--muted);
+        }
+
+        .btn.primary {
+            background: linear-gradient(90deg, var(--accent1), var(--danger));
+            color: white;
+        }
+
+        .btn.primary:hover {
+            background: linear-gradient(90deg, var(--accent1), #ff8e8e);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.4);
+        }
+
+        /* Profile Header */
+        .profile-header {
+            padding: 60px 0 40px;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(124, 58, 237, 0.05));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 52px;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 18px;
+        }
+
+        /* Profile Layout */
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 32px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .sidebar-card {
+            background: linear-gradient(165deg, rgba(20, 20, 22, 0.95), rgba(8, 8, 9, 0.98));
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, var(--accent1), var(--danger));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sidebar-subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sidebar-nav a {
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            transition: all 0.3s var(--ease);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-nav a:hover {
+            background: rgba(124, 58, 237, 0.1);
+            color: #fff;
+        }
+
+        .sidebar-nav a.active {
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--accent1);
+        }
+
+        /* Profile Content */
+        .profile-card {
+            background: linear-gradient(165deg, rgba(20, 20, 22, 0.95), rgba(8, 8, 9, 0.98));
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 24px;
+        }
+
+        .profile-avatar {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 40px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--accent1), var(--danger));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .profile-info h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, var(--accent1), var(--danger));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .profile-info p {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s var(--ease);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent1);
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* QR Section */
+        .qr-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .qr-card {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .qr-placeholder {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            background: rgba(124, 58, 237, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed rgba(124, 58, 237, 0.3);
+        }
+
+        /* Security Section */
+        .password-input-group {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 48px 0;
+            color: var(--muted);
+            font-size: 14px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            margin-top: 60px;
+        }
+
+        @media (max-width: 980px) {
+            .profile-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+
+            .qr-section {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 40px;
+            }
+        }
+
+        @media (max-width: 540px) {
+            .profile-avatar {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            h1 {
+                font-size: 32px;
+            }
+
+            .logo-text {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <header class="nav">
+        <div class="container nav-inner">
+            <a class="logo" href="dashboard.html">
+                <div class="logo-mark">P</div>
+                <div class="logo-text">PRAC</div>
+            </a>
+
+            <nav class="main-nav">
+                <a href="rates.html">Rates</a>
+                <a href="dashboard.html">Dashboard</a>
+                <span style="color: var(--muted); font-size: 14px;" id="userWelcome">User</span>
+                <a class="btn ghost" href="#" id="logoutBtn">Log out</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="container">
+            <h1>Profile Settings</h1>
+            <p class="subtitle">Manage your account information and security settings</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="profile-layout">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-card">
+                    <div class="sidebar-title">Settings</div>
+                    <p class="sidebar-subtitle">Manage your account preferences</p>
+
+                    <nav class="sidebar-nav">
+                        <a href="#" class="active" onclick="showTab('personal')">
+                            👤 Personal Info
+                        </a>
+                        <a href="#" onclick="showTab('security')">
+                            🔒 Security
+                        </a>
+                        <a href="#" onclick="showTab('qr')">
+                            📱 QR Code
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div>
+                <!-- Personal Info Tab -->
+                <div id="personal" class="tab-content active">
+                    <div class="profile-card">
+                        <div class="profile-avatar">
+                            <div class="avatar" id="userAvatar">JD</div>
+                            <div class="profile-info">
+                                <h2 id="userFullName">John Doe</h2>
+                                <p id="userEmail">john@example.com</p>
+                            </div>
+                        </div>
+
+                        <form id="profileForm">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" class="form-input" id="fullName" value="John Doe" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" class="form-input" id="email" value="john@example.com" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-input" id="phone" value="+1234567890">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Country</label>
+                                    <select class="form-input" id="country">
+                                        <option value="US" selected>United States</option>
+                                        <option value="UK">United Kingdom</option>
+                                        <option value="MA">Morocco</option>
+                                        <option value="FR">France</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label class="form-label">Address</label>
+                                    <input type="text" class="form-input" id="address"
+                                        value="123 Main Street, New York">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Date of Birth</label>
+                                    <input type="date" class="form-input" id="dob" value="1990-01-01">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Preferred Currency</label>
+                                    <select class="form-input" id="currency">
+                                        <option value="USD" selected>USD</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="GBP">GBP</option>
+                                        <option value="MAD">MAD</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 16px; margin-top: 32px;">
+                                <button type="submit" class="btn primary">Save Changes</button>
+                                <button type="button" class="btn ghost" onclick="resetForm()">Reset</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Security Tab -->
+                <div id="security" class="tab-content">
+                    <div class="profile-card">
+                        <h3 style="font-size: 20px; margin-bottom: 24px; color: var(--accent1);">Change Password</h3>
+
+                        <form id="passwordForm">
+                            <div class="form-group">
+                                <label class="form-label">Current Password</label>
+                                <div class="password-input-group">
+                                    <input type="password" class="form-input" id="currentPassword" required>
+                                    <button type="button" class="password-toggle"
+                                        onclick="togglePassword('currentPassword')">👁️</button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">New Password</label>
+                                <div class="password-input-group">
+                                    <input type="password" class="form-input" id="newPassword" required>
+                                    <button type="button" class="password-toggle"
+                                        onclick="togglePassword('newPassword')">👁️</button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Confirm Password</label>
+                                <div class="password-input-group">
+                                    <input type="password" class="form-input" id="confirmPassword" required>
+                                    <button type="button" class="password-toggle"
+                                        onclick="togglePassword('confirmPassword')">👁️</button>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn primary" style="margin-top: 24px;">Update Password</button>
+                        </form>
+
+                        <div style="margin-top: 48px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.05);">
+                            <h4 style="font-size: 18px; margin-bottom: 20px; color: white;">Two-Factor Authentication
+                            </h4>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600; margin-bottom: 4px;">Enhanced Security</div>
+                                    <div style="color: var(--muted); font-size: 14px;">Add an extra layer of security
+                                    </div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="twoFactorToggle">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QR Code Tab -->
+                <div id="qr" class="tab-content">
+                    <div class="profile-card">
+                        <h3 style="font-size: 20px; margin-bottom: 24px; color: var(--accent1);">QR Code Management</h3>
+
+                        <div class="qr-section">
+                            <div class="qr-card">
+                                <h4 style="margin-bottom: 20px; color: white;">Generate QR Code</h4>
+                                <div class="qr-placeholder">
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 48px;">📱</div>
+                                        <div style="color: var(--muted); margin-top: 8px;">QR Code</div>
+                                    </div>
+                                </div>
+                                <button class="btn primary" style="width: 100%; margin-top: 20px;">Generate QR</button>
+                            </div>
+
+                            <div class="qr-card">
+                                <h4 style="margin-bottom: 20px; color: white;">Scan QR Code</h4>
+                                <div class="qr-placeholder">
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 48px;">🔍</div>
+                                        <div style="color: var(--muted); margin-top: 8px;">Scanning Area</div>
+                                    </div>
+                                </div>
+                                <button class="btn primary" style="width: 100%; margin-top: 20px;">Start
+                                    Scanner</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div style="margin-bottom: 16px; font-size: 16px; font-weight: 600;">PRAC — Pay • Receive • Convert</div>
+            <div>© 2024 PRAC · <a href="#" style="color: var(--muted); text-decoration: none;">Security</a> · <a
+                    href="#" style="color: var(--muted); text-decoration: none;">Support</a> · <a href="rates.html"
+                    style="color: var(--muted); text-decoration: none;">Rates</a></div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        window.addEventListener('load', function () {
+            const user = localStorage.getItem('prac_user');
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const userData = JSON.parse(user);
+
+            // Update welcome message
+            const welcomeEl = document.getElementById('userWelcome');
+            welcomeEl.textContent = `Welcome, ${userData.username || 'User'}!`;
+            welcomeEl.style.background = 'linear-gradient(90deg, var(--accent1), var(--danger))';
+            welcomeEl.style.webkitBackgroundClip = 'text';
+            welcomeEl.style.backgroundClip = 'text';
+            welcomeEl.style.color = 'transparent';
+
+            // Load user data
+            if (userData.fullName) {
+                document.getElementById('fullName').value = userData.fullName;
+                document.getElementById('userFullName').textContent = userData.fullName;
+                document.getElementById('userAvatar').textContent = userData.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+            }
+            if (userData.email) {
+                document.getElementById('email').value = userData.email;
+                document.getElementById('userEmail').textContent = userData.email;
+            }
+        });
+
+        // Tab switching
+        function showTab(tabId) {
+            // Update sidebar nav
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Show selected tab
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Password toggle
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const button = event.target;
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                button.textContent = '👁️';
+            }
+        }
+
+        // Form submissions
+        document.getElementById('profileForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const btn = this.querySelector('button[type="submit"]');
+
+            // Disable button
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            try {
+                const response = await fetch('profile-api.php?action=update_profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ full_name: fullName, email: email })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Profile updated successfully!');
+
+                    // Fetch fresh data from server to ensure everything is in sync
+                    try {
+                        const freshResponse = await fetch('profile-api.php?action=get_profile');
+                        const freshData = await freshResponse.json();
+
+                        if (freshData.success) {
+                            const updatedUser = freshData.user;
+
+                            // Update displayed info
+                            document.getElementById('userFullName').textContent = updatedUser.fullName;
+                            document.getElementById('userEmail').textContent = updatedUser.email;
+                            document.getElementById('userAvatar').textContent = updatedUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+
+                            // Update local storage with full fresh data
+                            localStorage.setItem('prac_user', JSON.stringify(updatedUser));
+                        }
+                    } catch (err) {
+                        console.error('Error fetching fresh data:', err);
+                    }
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        });
+
+        document.getElementById('passwordForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match');
+                return;
+            }
+
+            const btn = this.querySelector('button[type="submit"]');
+
+            // Disable button
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Updating...';
+
+            try {
+                const response = await fetch('profile-api.php?action=update_password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Password updated successfully!');
+                    this.reset();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        });
+
+        function resetForm() {
+            document.getElementById('profileForm').reset();
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function (e) {
+            e.preventDefault();
+            localStorage.removeItem('prac_user');
+            window.location.href = 'login.html';
+        });
+
+        // Switch toggle styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 60px;
+                height: 34px;
+            }
+            
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(255,255,255,0.1);
+                transition: .4s;
+                border-radius: 34px;
+            }
+            
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 26px;
+                width: 26px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+            
+            input:checked + .slider {
+                background: linear-gradient(90deg, var(--accent1), var(--danger));
+            }
+            
+            input:checked + .slider:before {
+                transform: translateX(26px);
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+
+</html>

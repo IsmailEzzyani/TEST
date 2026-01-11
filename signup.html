@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRAC — Sign Up</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <a href="index.php" class="auth-logo">
+                <div class="auth-logo-mark">P</div>
+                <h1>PRAC</h1>
+            </a>
+
+            <h2 class="auth-title" data-i18n="auth.signup.title">Create account</h2>
+            <p class="auth-subtitle" data-i18n="auth.signup.subtitle">Join PRAC and start sending money globally</p>
+
+            <form id="signupForm">
+                <div class="form-group">
+                    <label class="form-label" for="fullName" data-i18n="auth.signup.nameLabel">Full name</label>
+                    <input type="text" id="fullName" class="form-input"
+                        data-i18n-placeholder="auth.signup.namePlaceholder" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="email" data-i18n="auth.signup.emailLabel">Email address</label>
+                    <input type="email" id="email" class="form-input"
+                        data-i18n-placeholder="auth.signup.emailPlaceholder" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="username" data-i18n="auth.signup.usernameLabel">Username</label>
+                    <input type="text" id="username" class="form-input"
+                        data-i18n-placeholder="auth.signup.usernamePlaceholder" placeholder="Choose a username"
+                        required>
+                    <div style="color: var(--muted); font-size: 12px; margin-top: 4px;"
+                        data-i18n="auth.signup.usernameHint">
+                        Only letters and numbers, at least 3 characters
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password" data-i18n="auth.signup.passwordLabel">Password</label>
+                    <div class="password-container">
+                        <input type="password" id="password" class="form-input"
+                            data-i18n-placeholder="auth.signup.passwordPlaceholder" placeholder="Create a password"
+                            required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('password')">👁️</button>
+                    </div>
+                    <div class="password-strength">
+                        <div id="passwordStrengthText" style="color: var(--muted);">Password strength</div>
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="passwordStrengthBar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirmPassword" data-i18n="auth.signup.confirmPasswordLabel">Confirm
+                        password</label>
+                    <div class="password-container">
+                        <input type="password" id="confirmPassword" class="form-input"
+                            data-i18n-placeholder="auth.signup.confirmPasswordPlaceholder"
+                            placeholder="Confirm your password" required>
+                        <button type="button" class="toggle-password"
+                            onclick="togglePassword('confirmPassword')">👁️</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label style="display:flex; align-items:center; gap:8px; color:var(--muted); font-size:14px;">
+                        <input type="checkbox" id="terms" style="accent-color: var(--accent1);" required>
+                        <span data-i18n="auth.signup.terms">I agree to the Terms of Service and Privacy Policy</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-auth" id="signupBtn" data-i18n="auth.signup.submit">Create
+                    account</button>
+
+                <div class="error-message" id="errorMessage"></div>
+                <div class="success-message" id="successMessage"></div>
+                <div class="loading" id="loading"
+                    style="display:none; text-align:center; color:var(--muted); margin-top:16px;">
+                    <div class="spinner"></div>
+                    Creating your account...
+                </div>
+
+                <div class="auth-links" style="margin-top: 24px;">
+                    <span data-i18n="auth.signup.hasAccount">Already have an account?</span> <a href="login.html"
+                        data-i18n="auth.signup.loginLink">Sign in</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+    <script>
+        // Localstorage fallback keys:
+        const USERS_KEY = 'prac_users';
+        const LAST_REGISTERED = 'prac_last_registered';
+
+        function getUsers() {
+            try {
+                const raw = localStorage.getItem(USERS_KEY);
+                return raw ? JSON.parse(raw) : [];
+            } catch {
+                return [];
+            }
+        }
+        function saveUsers(users) {
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+
+        // Password strength helpers
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/\d/.test(password)) strength++;
+            if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
+            return strength; // 0..5
+        }
+
+        function updatePasswordStrength() {
+            const password = document.getElementById('password').value;
+            const bar = document.getElementById('passwordStrengthBar');
+            const text = document.getElementById('passwordStrengthText');
+
+            if (!password) {
+                bar.style.width = '0%';
+                bar.style.background = 'transparent';
+                text.textContent = 'Password strength';
+                text.style.color = 'var(--muted)';
+                return;
+            }
+
+            const strength = checkPasswordStrength(password);
+            const pct = (strength / 5) * 100;
+            bar.style.width = pct + '%';
+
+            if (strength <= 2) {
+                bar.style.background = '#ff6b6b';
+                text.textContent = 'Weak password';
+                text.style.color = '#ff6b6b';
+            } else if (strength <= 4) {
+                bar.style.background = '#ffd166';
+                text.textContent = 'Good password';
+                text.style.color = '#ffd166';
+            } else {
+                bar.style.background = '#5af78e';
+                text.textContent = 'Strong password';
+                text.style.color = '#5af78e';
+            }
+        }
+
+        document.getElementById('password').addEventListener('input', updatePasswordStrength);
+
+        function togglePassword(fieldId) {
+            const input = document.getElementById(fieldId);
+            const btn = input.parentNode.querySelector('.toggle-password');
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🔒';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁️';
+            }
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+        function showSuccess(msg) {
+            const el = document.getElementById('successMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        // Signup submit - UPDATED TO USE PHP BACKEND
+        document.getElementById('signupForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            // Reset messages
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('loading').style.display = 'none';
+            document.querySelectorAll('.form-input').forEach(i => i.classList.remove('invalid'));
+
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const terms = document.getElementById('terms').checked;
+
+            // Basic validation
+            if (fullName.length < 2) {
+                showError('Full name must be at least 2 characters');
+                document.getElementById('fullName').classList.add('invalid');
+                return;
+            }
+
+            if (!/^[a-zA-Z0-9]{3,}$/.test(username)) {
+                showError('Username must be at least 3 characters and contain only letters and numbers');
+                document.getElementById('username').classList.add('invalid');
+                return;
+            }
+
+            if (!/^\S+@\S+\.\S+$/.test(email)) {
+                showError('Please enter a valid email address');
+                document.getElementById('email').classList.add('invalid');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showError('Passwords do not match');
+                document.getElementById('confirmPassword').classList.add('invalid');
+                return;
+            }
+
+            if (checkPasswordStrength(password) < 3) {
+                showError('Password must be stronger (min 3 of 5 checks)');
+                document.getElementById('password').classList.add('invalid');
+                return;
+            }
+
+            if (!terms) {
+                showError('Please agree to the Terms of Service and Privacy Policy');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('signupBtn').disabled = true;
+
+            try {
+                // Send signup request to PHP backend
+                const response = await fetch('signup.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        full_name: fullName,
+                        email: email,
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Save user data to localStorage
+                    const userData = {
+                        loggedIn: true,
+                        id: data.user.id,
+                        username: data.user.username,
+                        email: data.user.email,
+                        full_name: data.user.full_name,
+                        is_admin: data.user.is_admin,
+                        wallet_usd: data.user.wallet_usd,
+                        wallet_eur: data.user.wallet_eur,
+                        wallet_gbp: data.user.wallet_gbp
+                    };
+
+                    localStorage.setItem('prac_user', JSON.stringify(userData));
+
+                    // Save for remember me
+                    localStorage.setItem('prac_remember', email);
+
+                    // Show success and redirect
+                    showSuccess('Account created successfully! Welcome to PRAC.');
+
+                    // Redirect after delay
+                    setTimeout(() => {
+                        if (data.user.is_admin) {
+                            window.location.href = 'admin.html';
+                        } else {
+                            window.location.href = 'dashboard.html';
+                        }
+                    }, 2000);
+
+                } else {
+                    showError(data.message || 'Signup failed');
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('signupBtn').disabled = false;
+                }
+
+            } catch (error) {
+                console.error('Signup error:', error);
+                showError('Network error. Please try again later.');
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('signupBtn').disabled = false;
+            }
+        });
+
+        // Remove invalid class when editing
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('input', () => input.classList.remove('invalid'));
+        });
+
+        // Auto-focus first input
+        window.addEventListener('load', function () {
+            document.getElementById('fullName').focus();
+        });
+    </script>
+</body>
+
+</html>

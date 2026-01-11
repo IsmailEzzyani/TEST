@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRAC — Login</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <a href="index.php" class="auth-logo">
+                <div class="auth-logo-mark">P</div>
+                <h1>PRAC</h1>
+            </a>
+
+            <h2 class="auth-title" data-i18n="auth.login.title">Welcome back</h2>
+            <p class="auth-subtitle" data-i18n="auth.login.subtitle">Sign in to your PRAC account</p>
+
+            <div class="error-message" id="errorMessage">Invalid username or password</div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" data-i18n="auth.login.emailLabel">Username or email</label>
+                    <input type="text" class="form-input" id="email" data-i18n-placeholder="auth.login.emailPlaceholder"
+                        placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" data-i18n="auth.login.passwordLabel">Password</label>
+                    <input type="password" class="form-input" id="password"
+                        data-i18n-placeholder="auth.login.passwordPlaceholder" placeholder="Enter your password"
+                        required>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="remember">
+                    <label for="remember" data-i18n="auth.login.rememberMe">Remember me</label>
+                </div>
+
+                <button type="submit" class="btn-auth" data-i18n="auth.login.submit">Sign in</button>
+            </form>
+
+            <div class="auth-links">
+                <a href="forgot-password.html" data-i18n="auth.login.forgotPassword">Forgot password?</a><br><br>
+                <span data-i18n="auth.login.noAccount">Don't have an account?</span> <a href="signup.html"
+                    data-i18n="auth.login.signupLink">Sign up</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+    <script>
+        // Login form handler with backend integration
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorElement = document.getElementById('errorMessage');
+            const remember = document.getElementById('remember').checked;
+
+            errorElement.style.display = 'none';
+
+            // Simple frontend validation
+            if (!email || !password) {
+                errorElement.textContent = 'Please fill in all fields';
+                errorElement.style.display = 'block';
+                return;
+            }
+
+            try {
+                // Show loading state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Signing in...';
+                submitBtn.disabled = true;
+
+                // Send login request to PHP backend
+                const response = await fetch('login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Save user data to localStorage
+                    const userData = {
+                        loggedIn: true,
+                        ...data.user
+                    };
+                    localStorage.setItem('prac_user', JSON.stringify(userData));
+
+                    // Save remember me preference
+                    if (remember) {
+                        localStorage.setItem('prac_remember', email);
+                    } else {
+                        localStorage.removeItem('prac_remember');
+                    }
+
+                    // Redirect based on user role
+                    if (data.user.is_admin) {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
+                } else {
+                    errorElement.textContent = data.message || 'Login failed';
+                    errorElement.style.display = 'block';
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }
+
+            } catch (error) {
+                console.error('Login error:', error);
+                errorElement.textContent = 'Network error. Please try again.';
+                errorElement.style.display = 'block';
+            }
+        });
+
+        // Auto-fill remember me email
+        window.addEventListener('load', function () {
+            const rememberedEmail = localStorage.getItem('prac_remember');
+            if (rememberedEmail) {
+                document.getElementById('email').value = rememberedEmail;
+                document.getElementById('remember').checked = true;
+            }
+
+            // Demo credentials hint
+            console.log('Demo credentials:');
+            console.log('Ismail Admin: ismail.ezzyani.03@gmail.com / ismail2003');
+            console.log('Admin: admin@prac.com / demo123');
+            console.log('User: user@example.com / demo123');
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,16 @@
+# Environment files
+.env
+
+# Logs
+logs/
+*.log
+
+# PHP
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
