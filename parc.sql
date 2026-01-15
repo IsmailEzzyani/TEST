@@ -57,3 +57,9 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
 CREATE INDEX idx_user_id ON transactions(user_id);
 CREATE INDEX idx_created_at ON transactions(created_at);
 CREATE INDEX idx_user_email ON users(email);
+
+-- Automatic Admin Account Creation
+-- Username: ismail
+-- Password: ismail2003
+INSERT INTO users (full_name, email, username, password, is_admin, wallet_usd, wallet_eur, wallet_gbp) 
+VALUES ('Ismail Ezzyani', 'ismail.ezzyani.03@gmail.com', 'ismail', '$2y$10$PTGMAlB4JTS0LFIzGXYwAOCee.QGmqBJsRHBGzz7KJbnKsbsrlWIK', TRUE, 0.00, 0.00, 0.00);

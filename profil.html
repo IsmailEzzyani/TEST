@@ -428,6 +428,7 @@
             <nav class="main-nav">
                 <a href="rates.html">Rates</a>
                 <a href="dashboard.html">Dashboard</a>
+                <a href="admin.html" id="adminLink" style="display: none;">Admin Panel</a>
                 <span style="color: var(--muted); font-size: 14px;" id="userWelcome">User</span>
                 <a class="btn ghost" href="#" id="logoutBtn">Log out</a>
             </nav>
@@ -649,6 +650,11 @@
             welcomeEl.style.webkitBackgroundClip = 'text';
             welcomeEl.style.backgroundClip = 'text';
             welcomeEl.style.color = 'transparent';
+
+            // Show admin link if user is admin
+            if (userData.is_admin) {
+                document.getElementById('adminLink').style.display = 'inline-block';
+            }
 
             // Load user data
             if (userData.fullName) {
